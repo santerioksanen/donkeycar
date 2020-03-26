@@ -61,13 +61,16 @@ class IMU:
         elif self.sensortype == SENSOR_LSM6DS33:
             import board
             import busio
-            from adafruit_lsm6ds import LSM6DS33, Rate
+            from adafruit_lsm6ds import LSM6DS33, Rate, AccelRange, GyroRange
 
             i2c = busio.I2C(board.SCL, board.SDA)
 
             self.sensor = LSM6DS33(i2c, 0x6b)
             self.sensor.gyro_data_rate = Rate.RATE_104_HZ
             self.sensor.accelerometer_data_rate = Rate.RATE_104_HZ
+
+            self.sensor.accelerometer_range = AccelRange.RANGE_4G
+            self.sensor.gyro_range = GyroRange.RANGE_250_DPS
         
         self.accel = { 'x' : 0., 'y' : 0., 'z' : 0. }
         self.gyro = { 'x' : 0., 'y' : 0., 'z' : 0. }
