@@ -2,6 +2,7 @@
 import time
 SENSOR_MPU6050 = 'mpu6050'
 SENSOR_MPU9250 = 'mpu9250'
+SENSOR_LSM6DS33 = 'lsm6ds33'
 
 DLP_SETTING_DISABLED = 0
 CONFIG_REGISTER = 0x1A
@@ -23,6 +24,9 @@ class IMU:
     
     - MPU9250
     pip install mpu9250-jmdev
+
+    - LSM6DS33
+    pip install adafruit-circuitpython-lsm6ds
     
     '''
 
@@ -35,7 +39,7 @@ class IMU:
             if(dlp_setting > 0):
                 self.sensor.bus.write_byte_data(self.sensor.address, CONFIG_REGISTER, dlp_setting)
         
-        else:
+        elif self.sensortype == SENSOR_MPU9250:
             from mpu9250_jmdev.registers import AK8963_ADDRESS, GFS_1000, AFS_4G, AK8963_BIT_16, AK8963_MODE_C100HZ
             from mpu9250_jmdev.mpu_9250 import MPU9250
 
@@ -53,7 +57,17 @@ class IMU:
                 self.sensor.writeSlave(CONFIG_REGISTER, dlp_setting)
             self.sensor.calibrateMPU6500()
             self.sensor.configure()
+        
+        elif self.sensortype == SENSOR_LSM6DS33:
+            import board
+            import busio
+            from adafruit_lsm6ds import LSM6DS33, Rate
 
+            i2c = busio.I2C(board.SCL, board.SDA)
+
+            self.sensor = LSM6DS33(i2c, 0x6b)
+            self.sensor.gyro_data_rate = Rate.RATE_104_HZ
+            self.sensor.accelerometer_data_rate = Rate.RATE_104_HZ
         
         self.accel = { 'x' : 0., 'y' : 0., 'z' : 0. }
         self.gyro = { 'x' : 0., 'y' : 0., 'z' : 0. }
@@ -71,13 +85,20 @@ class IMU:
         try:
             if self.sensortype == SENSOR_MPU6050:
                 self.accel, self.gyro, self.temp = self.sensor.get_all_data()
-            else:
+            
+            elif self.sensortype == SENSOR_MPU9250:
                 from mpu9250_jmdev.registers import GRAVITY
                 ret = self.sensor.getAllData()
                 self.accel = { 'x' : ret[1] * GRAVITY, 'y' : ret[2] * GRAVITY, 'z' : ret[3] * GRAVITY }
                 self.gyro = { 'x' : ret[4], 'y' : ret[5], 'z' : ret[6] }
                 self.mag = { 'x' : ret[13], 'y' : ret[14], 'z' : ret[15] }
                 self.temp = ret[16]
+            
+            elif self.sensortype == SENSOR_LSM6DS33:
+                accel = self.sensor.acceleration
+                self.accel = { 'x': accel[0], 'y': accel[1], 'z': accel[2] }
+                gyro = self.sensor.gyro
+                self.gyro = { 'x': gyro[0], 'y': gyro[1], 'z': gyro[2] }
         except:
             print('failed to read imu!!')
             
