@@ -311,11 +311,11 @@ var driveHandler = new function() {
               state.brakeOn = false;
             }
 
-            if (state.tele.user.throttle != 0) {
+            /*if (state.tele.user.throttle != 0) {
               state.recording = true;
             } else {
               state.recording = false;
-            }
+            }*/
 
             postDrive()
 
