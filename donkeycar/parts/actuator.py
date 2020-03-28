@@ -42,6 +42,23 @@ class PCA9685:
         self.set_pulse(pulse)
 
 
+class pulseio_PWM():
+    def __init__(self, pin, freq=50, inverted=False):
+        import pulseio, board
+
+        self.pin = board['PWM{}'.format(pin)]
+        pulseio.PWMOut(self.pin, frequency=freq, duty_cycle=0)
+
+    def __del__(self):
+        pass
+    
+    def set_pulse(self, pulse):
+        pulseio.PWMOut(self.pin, frequency=freq, duty_cycle=0)
+    
+    def run(self, pulse):
+        self.set_pulse(pulse)
+
+
 class PiGPIO_PWM():
     '''
     # Use the pigpio python module and daemon to get hardware pwm controls from
