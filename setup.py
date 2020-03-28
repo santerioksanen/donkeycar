@@ -67,6 +67,9 @@ setup(name='donkeycar',
                         'pytest-cov',
                         'responses',
                         ],
+                    'edge-dev-board' : [
+
+                        ],
                     'ci': ['codecov'],
                     'tf': ['tensorflow==1.13.1'],
                     'tf_gpu': ['tensorflow-gpu==1.13.1'],
